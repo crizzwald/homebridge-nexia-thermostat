@@ -1,20 +1,20 @@
 {
 	"name": "homebridge-nexia-thermostat",
 	"version": "0.0.1",
-	"description": "Nexia Thermostat plugin for homebridge: https://github.com/nfarina/homebridge",
+	"description": "Nexia Thermostat plugin for homebridge: https://github.com/crizzwald/homebridge-nexia-thermostat",
 	"keywords": [
 		"homebridge-plugin"
 	],
 	"bugs": {
-		"url": "http://github.com/jeffmcfadden/homebridge-pi-thermostat-accessory/issues"
+		"url": "https://github.com/crizzwald/homebridge-nexia-thermostat/issues"
 	},
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/jeffmcfadden/homebridge-pi-thermostat-accessory-XXX.git"
+		"url": "git@github.com:crizzwald/homebridge-nexia-thermostat.git"
 	},
 	"dependencies": {
-		"request": "^2.65.0"
+		"request": "^2.81.0"
 	},
 	"engines": {
 		"node": ">=0.12.0",
