@@ -10,18 +10,28 @@ module.export = function(homebridge) {
 function NexiaThermostat(log, config) {
   this.log = log;
 	this.name = config.name;
+
   //https://www.mynexia.com/mobile/
 	this.apiroute = config.apiroute;
+
   https://www.mynexia.com/mobile/houses/{houseId}
   this.houseId = config.houseId;
+
   //https://www.mynexia.com/mobile/xxl_zones/{zoneId}/zone_mode
   //https://www.mynexia.com/mobile/xxl_zones/{zoneId}/setpoints
   this.zoneId = config.zoneId;
+
   //response.result._links.child[0].data.items[{thermostatIndex}]
   this.thermostatIndex = config.thermostatIndex;
+
   //X-MobileId and X-ApiKey headers
 	this.xMobileId = config.xMobileId;
 	this.xApiKey = config.xApiKey;
+
+  //Properties
+  this.manufacturer = config.manufacturer;
+  this.model = config.model;
+  this.serialNumber = config.serialNumber;
 }
 
 //Prototype
@@ -105,16 +115,73 @@ NexiaThermostat.prototype = {
       }
     }.bind(this));
   },
-  getCurrentTemperature: function(callback) {},
-  getTargetTemperature: function(callback) {},
-  setTargetTemperature: function(value, callback) {},
-  getTemperatureDisplayUnits: function(callback) {},
-  setTemperatureDisplayUnits: function(value, callback) {},
-  getCurrentRelativeHumidity: function(callback) {},
-  getTargetRelativeHumidity: function(callback) {},
-  setTargetRelativeHumidity: function(value, callback) {},
-  getCoolingThresholdTemperature: function(callback) {},
-  getHeatingThresholdTemperature: function(callback) {},
+  getCurrentTemperature: function(callback) {
+    this.httpRequest("houses/" + this.houseId, "GET", function(error, response, data) {
+      if(error) {
+        this.log("Error in getCurrentTemperature: %s", error);
+        callback(error);
+      } else {
+        this.log("getCurrentTemperature succeeded");
+        var f = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].temperature;
+        var c = ftoc(f);
+        callback(null, c);
+      }
+    }.bind(this));
+  },
+  getTargetTemperature: function(callback) {
+    this.httpRequest("houses/" + this.houseId, "GET", function(error, response, data){
+      if(error) {
+        this.log("Error in getTargetTemperature: %s", error);
+        callback(error);
+      } else {
+        var systemStatus = data.result._links.child[0].data.items[this.thermostatIndex].system_status;
+        //Get the current temperature
+        var f = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].temperature;
+        //If cooling, return cool set point
+        if(systemStatus === "Cooling") {
+          f = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.cool;
+        }
+        //If heating, return heat set point
+        if(systemStatus === "Heating") {
+          f = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.heat;
+        }
+        var c = ftoc(f);
+        callback(null, c);
+      }
+    }.bind(this));
+  },
+  setTargetTemperature: function(value, callback) {
+    //Do something...
+    callback(null);//no error
+  },
+  getTemperatureDisplayUnits: function(callback) {
+    //Do something...
+    callback(null);//no error
+  },
+  setTemperatureDisplayUnits: function(value, callback) {
+    //Do something...
+    callback(null);//no error
+  },
+  getCurrentRelativeHumidity: function(callback) {
+    //Do something...
+    callback(null);//no error
+  },
+  getTargetRelativeHumidity: function(callback) {
+    //Do something...
+    callback(null);//no error
+  },
+  setTargetRelativeHumidity: function(value, callback) {
+    //Do something...
+    callback(null);//no error
+  },
+  getCoolingThresholdTemperature: function(callback) {
+    //Do something...
+    callback(null);//no error
+  },
+  getHeatingThresholdTemperature: function(callback) {
+    //Do something...
+    callback(null);//no error
+  },
   getName: function(callback) {
 		this.log("getName :", this.name);
 		var error = null;
@@ -127,9 +194,9 @@ NexiaThermostat.prototype = {
 		var informationService = new Service.AccessoryInformation();
 
 		informationService
-			.setCharacteristic(Characteristic.Manufacturer, "HTTP Manufacturer")
-			.setCharacteristic(Characteristic.Model, "HTTP Model")
-			.setCharacteristic(Characteristic.SerialNumber, "HTTP Serial Number");
+			.setCharacteristic(Characteristic.Manufacturer, this.manufacturer)
+			.setCharacteristic(Characteristic.Model, this.model)
+			.setCharacteristic(Characteristic.SerialNumber, this.serialNumber);
 
 		// Required Characteristics
     var thermostatService = new Service.Thermostat(this.name);
