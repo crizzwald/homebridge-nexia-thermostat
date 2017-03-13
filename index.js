@@ -259,12 +259,12 @@ NexiaThermostat.prototype = {
 		var error = null;
 		callback(error);
 	},
-/*	getCoolingThresholdTemperature: function(callback) {
+	getCoolingThresholdTemperature: function(callback) {
 		this.log("getCoolingThresholdTemperature: ", this.coolingThresholdTemperature);
 		var error = null;
 		callback(error, this.coolingThresholdTemperature);
 	},
-*/	getHeatingThresholdTemperature: function(callback) {
+	getHeatingThresholdTemperature: function(callback) {
 		this.log("getHeatingThresholdTemperature :" , this.heatingThresholdTemperature);
 		var error = null;
 		callback(error, this.heatingThresholdTemperature);
@@ -321,11 +321,11 @@ NexiaThermostat.prototype = {
 			.getCharacteristic(Characteristic.TargetRelativeHumidity)
 			.on('get', this.getTargetRelativeHumidity.bind(this))
 			.on('set', this.setTargetRelativeHumidity.bind(this));
-		/*
+		
 		this.service
 			.getCharacteristic(Characteristic.CoolingThresholdTemperature)
 			.on('get', this.getCoolingThresholdTemperature.bind(this));
-		*/
+
 
 		this.service
 			.getCharacteristic(Characteristic.HeatingThresholdTemperature)
