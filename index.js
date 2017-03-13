@@ -32,17 +32,22 @@ NexiaThermostat.prototype = {
 	getCurrentHeatingCoolingState: function(callback) {
 		this.log("getCurrentHeatingCoolingState from:", this.apiroute+"/status");
 		request.get({
-			url: this.apiroute+"/status",
-			auth : this.auth
+			url: this.apiroute + "houses/" + this.houseId,
+			headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
 		}, function(err, response, body) {
 			if (!err && response.statusCode == 200) {
 				this.log("response success");
-				var json = JSON.parse(body); //{targetHeatingCoolingState":3,"currentHeatingCoolingState":0,"targetTemperature":10,"temperature":12,"humidity":98}
-				this.log("currentHeatingCoolingState is %s", json.currentHeatingCoolingState);
-				this.currentHeatingCoolingState = json.currentHeatingCoolingState;
-				this.service.setCharacteristic(Characteristic.CurrentHeatingCoolingState, this.currentHeatingCoolingState);
-
-				callback(null, this.currentHeatingCoolingState); // success
+        var data = JSON.parse(body);
+        var rawState = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].current_zone_mode;
+        var characteristic = Characteristic.CurrentHeatingCoolingState.OFF;
+        if (rawState === "COOL") {
+          characteristic = Characteristic.CurrentHeatingCoolingState.COOL;
+        } else if (rawState === "HEAT") {
+          characteristic = Characteristic.CurrentHeatingCoolingState.HEAT;
+        } else if (rawState === "AUTO") {
+          characteristic = Characteristic.CurrentHeatingCoolingState.AUTO;
+        }
+        return callback(null, characteristic);
 			} else {
 				this.log("Error getting CurrentHeatingCoolingState: %s", err);
 				callback(err);
