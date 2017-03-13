@@ -36,6 +36,7 @@ NexiaThermostat.prototype = {
 			url: requestUrl,
 			headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
 		}, function(err, response, body) {
+      this.log("Request made to: %s", requestUrl);
 			if (!err && response.statusCode == 200) {
 				this.log("response success");
         var data = JSON.parse(body);
