@@ -9,7 +9,7 @@
     "accessories": [
         {
             "accessory": "NexiaThermostat",
-            "name": "Upstairs Thermostat",
+            "name": "Downstairs",
           	"apiroute": "https://www.mynexia.com/mobile/",
             "houseId": "231228",
             "thermostatIndex": 0,

@@ -30,9 +30,10 @@ NexiaThermostat.prototype = {
 	},
 	// Required
 	getCurrentHeatingCoolingState: function(callback) {
-		this.log("getCurrentHeatingCoolingState");
+    var requestUrl = this.apiroute + "houses/" + this.houseId;
+		this.log("getCurrentHeatingCoolingState from: %s", requestUrl);
 		request.get({
-			url: this.apiroute + "houses/" + this.houseId,
+			url: requestUrl,
 			headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
 		}, function(err, response, body) {
 			if (!err && response.statusCode == 200) {
@@ -49,7 +50,7 @@ NexiaThermostat.prototype = {
         }
         return callback(null, characteristic);
 			} else {
-				this.log("Error getting CurrentHeatingCoolingState: %s", err);
+				this.log("Error getting CurrentHeatingCoolingState response.statusCode: %s", response.statusCode);
 				callback(err);
 			}
 		}.bind(this));
