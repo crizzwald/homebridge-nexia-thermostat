@@ -10,44 +10,16 @@ module.exports = function(homebridge){
 
 function NexiaThermostat(log, config) {
 	this.log = log;
-	this.maxTemp = config.maxTemp || 25;
-	this.minTemp = config.minTemp || 15;
-	this.name = config.name;
-	this.apiroute = config.apiroute || "apiroute";
-	this.log(this.name, this.apiroute);
-	this.username = config.username || null;
-	this.password = config.password || null;
-
-	if(this.username != null && this.password != null){
-		this.auth = {
-			user : this.username,
-			pass : this.password
-		};
-	}
-
-	//Characteristic.TemperatureDisplayUnits.CELSIUS = 0;
-	//Characteristic.TemperatureDisplayUnits.FAHRENHEIT = 1;
-	this.temperatureDisplayUnits = Characteristic.TemperatureDisplayUnits.CELSIUS;
-	this.currentTemperature = 19;
-	this.currentRelativeHumidity = 0.70;
-	// The value property of CurrentHeatingCoolingState must be one of the following:
-	//Characteristic.CurrentHeatingCoolingState.OFF = 0;
-	//Characteristic.CurrentHeatingCoolingState.HEAT = 1;
-	//Characteristic.CurrentHeatingCoolingState.COOL = 2;
-	this.heatingCoolingState = Characteristic.CurrentHeatingCoolingState.AUTO;
-	this.targetTemperature = 21;
-	this.targetRelativeHumidity = 0.5;
-	this.heatingThresholdTemperature = 25;
-	this.coolingThresholdTemperature = 5;
-	// The value property of TargetHeatingCoolingState must be one of the following:
-	//Characteristic.TargetHeatingCoolingState.OFF = 0;
-	//Characteristic.TargetHeatingCoolingState.HEAT = 1;
-	//Characteristic.TargetHeatingCoolingState.COOL = 2;
-	//Characteristic.TargetHeatingCoolingState.AUTO = 3;
-	this.targetHeatingCoolingState = Characteristic.TargetHeatingCoolingState.AUTO;
-
+  this.name = config.name;
+  this.apiroute = config.apiroute;
+  this.houseId = config.houseId;
+  this.thermostatIndex = config.thermostatIndex;
+  this.xMobileId = config.xMobileId;
+	this.xApiKey = config.xApiKey;
+  this.manufacturer = config.manufacturer;
+  this.model = config.model;
+  this.serialNumber = config.serialNumber;
 	this.service = new Service.Thermostat(this.name);
-
 }
 
 NexiaThermostat.prototype = {
@@ -321,7 +293,7 @@ NexiaThermostat.prototype = {
 			.getCharacteristic(Characteristic.TargetRelativeHumidity)
 			.on('get', this.getTargetRelativeHumidity.bind(this))
 			.on('set', this.setTargetRelativeHumidity.bind(this));
-		
+
 		this.service
 			.getCharacteristic(Characteristic.CoolingThresholdTemperature)
 			.on('get', this.getCoolingThresholdTemperature.bind(this));
