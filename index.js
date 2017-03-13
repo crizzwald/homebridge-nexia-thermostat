@@ -57,18 +57,23 @@ NexiaThermostat.prototype = {
 	getTargetHeatingCoolingState: function(callback) {
 		this.log("getTargetHeatingCoolingState from:", this.apiroute+"/status");
 		request.get({
-			url: this.apiroute+"/status",
-			auth : this.auth
+			url: this.apiroute + "houses/" + this.houseId,
+      headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
 		}, function(err, response, body) {
 			if (!err && response.statusCode == 200) {
 				this.log("response success");
-				var json = JSON.parse(body); //{"targetHeatingCoolingState":3,"currentHeatingCoolingState":0,"targetTemperature":10,"temperature":12,"humidity":98}
-				this.log("TargetHeatingCoolingState received is %s", json.targetHeatingCoolingState, json.targetStateCode);
-				this.targetHeatingCoolingState = json.targetHeatingCoolingState !== undefined? json.targetHeatingCoolingState : json.targetStateCode;
-				this.log("TargetHeatingCoolingState is now %s", this.targetHeatingCoolingState);
-				//this.service.setCharacteristic(Characteristic.TargetHeatingCoolingState, this.targetHeatingCoolingState);
+				var data = JSON.parse(body);
+        var rawState = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].current_zone_mode;
 
-				callback(null, this.targetHeatingCoolingState); // success
+        var characteristic = Characteristic.TargetHeatingCoolingState.OFF;
+        if (rawState === "COOL") {
+          characteristic = Characteristic.TargetHeatingCoolingState.COOL;
+        } else if (rawState === "HEAT") {
+          characteristic = Characteristic.TargetHeatingCoolingState.HEAT;
+        } else if (rawState === "AUTO") {
+          characteristic = Characteristic.TargetHeatingCoolingState.AUTO;
+        }
+        return callback(null, characteristic);
 			} else {
 				this.log("Error getting TargetHeatingCoolingState: %s", err);
 				callback(err);
@@ -79,71 +84,21 @@ NexiaThermostat.prototype = {
 		if(value === undefined) {
 			callback(); //Some stuff call this without value doing shit with the rest
 		} else {
-			this.log("setTargetHeatingCoolingState from/to:", this.targetHeatingCoolingState, value);
-
-			var action;
-
-			switch(value) {
-				case Characteristic.TargetHeatingCoolingState.OFF:
-				action = "/off";
-				break;
-
-				case Characteristic.TargetHeatingCoolingState.HEAT:
-				action = "/comfort";
-				break;
-
-				case Characteristic.TargetHeatingCoolingState.AUTO:
-				action = "/auto";
-				break;
-
-				case Characteristic.TargetHeatingCoolingState.COOL:
-				action = "/no-frost";
-				break;
-
-				default:
-				action = "/no-frost";
-				this.log("Not handled case:", value);
-				break;
-			}
-
-			request.get({
-				url: this.apiroute + action,
-				auth : this.auth
-			}, function(err, response, body) {
-				if (!err && response.statusCode == 200) {
-					this.log("response success");
-					//this.service.setCharacteristic(Characteristic.TargetHeatingCoolingState, value);
-					this.targetHeatingCoolingState = value;
-					callback(null); // success
-				} else {
-					this.log("Error getting state: %s", err);
-					callback(err);
-				}
-			}.bind(this));
+			callback(null);
 		}
 	},
 	getCurrentTemperature: function(callback) {
 		this.log("getCurrentTemperature from:", this.apiroute+"/status");
 		request.get({
-			url: this.apiroute+"/status",
-			auth : this.auth
+      url: this.apiroute + "houses/" + this.houseId,
+      headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
 		}, function(err, response, body) {
 			if (!err && response.statusCode == 200) {
 				this.log("response success");
-				var json = JSON.parse(body); //{targetHeatingCoolingState":3,"currentHeatingCoolingState":0,"temperature":"18.10","humidity":"34.10"}
-
-				if (json.currentTemperature != undefined)
-                                {
-                                  this.log("CurrentTemperature %s", json.currentTemperature);
-                                  this.currentTemperature = parseFloat(json.currentTemperature);
-                                }
-                                else
-                                {
-                                  this.log("Temperature %s", json.temperature);
-                                  this.currentTemperature = parseFloat(json.temperature);
-                                }
-
-				callback(null, this.currentTemperature); // success
+				var data = JSON.parse(body);
+        var f = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].temperature;
+        var c = (f-32.0) / 1.8;
+        callback(null, c);
 			} else {
 				this.log("Error getting state: %s", err);
 				callback(err);
@@ -153,15 +108,22 @@ NexiaThermostat.prototype = {
 	getTargetTemperature: function(callback) {
 		this.log("getTargetTemperature from:", this.apiroute+"/status");
 		request.get({
-			url: this.apiroute+"/status",
-			auth : this.auth
+      url: this.apiroute + "houses/" + this.houseId,
+      headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
 		}, function(err, response, body) {
 			if (!err && response.statusCode == 200) {
 				this.log("response success");
-				var json = JSON.parse(body); //{targetHeatingCoolingState":3,"currentHeatingCoolingState":0"temperature":"18.10","humidity":"34.10"}
-				this.targetTemperature = parseFloat(json.targetTemperature);
-				this.log("Target temperature is %s", this.targetTemperature);
-				callback(null, this.targetTemperature); // success
+				var data = JSON.parse(body);
+        var systemStatus = data.result._links.child[0].data.items[this.thermostatIndex].system_status;
+        var f = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].temperature;
+        if(systemStatus === "Cooling") {
+          f = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.cool;
+        }
+        if(systemStatus === "Heating") {
+          f = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.heat;
+        }
+        var c = (f-32.0) / 1.8;
+        callback(null, c);
 			} else {
 				this.log("Error getting state: %s", err);
 				callback(err);

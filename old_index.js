@@ -27,83 +27,19 @@ NexiaThermostat.prototype = {
 		callback(null);
 	},
 	getCurrentHeatingCoolingState: function(callback) {
-		this.log("getCurrentHeatingCoolingState from:", this.apiroute);
-    this.httpRequest("houses/" + this.houseId, "GET", function(error, response, data) {
-      if(error) {
-        this.log("Error in getCurrentHeatingCoolingState: %s", error);
-        callback(error)
-      } else {
-        this.log("getCurrentHeatingCoolingState succeeded");
-        var rawState = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].current_zone_mode;
 
-        var characteristic = Characteristic.CurrentHeatingCoolingState.OFF;
-        if (rawState === "COOL") {
-          characteristic = Characteristic.CurrentHeatingCoolingState.COOL;
-        } else if (rawState === "HEAT") {
-          characteristic = Characteristic.CurrentHeatingCoolingState.HEAT;
-        } else if (rawState === "AUTO") {
-          characteristic = Characteristic.CurrentHeatingCoolingState.AUTO;
-        }
-
-        return callback(null, characteristic);
-      }
-    }.bind(this));
   },
   setTargetHeatingCoolingState: function(targetHeatingCoolingState, callback) {
-    callback(null);
+
   },
   getTargetHeatingCoolingState: function(callback) {
-    this.httpRequest("houses/" + this.houseId, "GET", function(error, response, data) {
-      if(error) {
-        this.log("Error in getCurrentHeatingCoolingState: %s", error);
-        callback(error)
-      } else {
-        this.log("getTargetHeatingCoolingState succeeded");
-        var rawState = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].current_zone_mode;
 
-        var characteristic = Characteristic.TargetHeatingCoolingState.OFF;
-        if (rawState === "COOL") {
-          characteristic = Characteristic.TargetHeatingCoolingState.COOL;
-        } else if (rawState === "HEAT") {
-          characteristic = Characteristic.TargetHeatingCoolingState.HEAT;
-        } else if (rawState === "AUTO") {
-          characteristic = Characteristic.TargetHeatingCoolingState.AUTO;
-        }
-        return callback(null, characteristic);
-      }
-    }.bind(this));
   },
   getCurrentTemperature: function(callback) {
-    this.httpRequest("houses/" + this.houseId, "GET", function(error, response, data) {
-      if(error) {
-        this.log("Error in getCurrentTemperature: %s", error);
-        callback(error);
-      } else {
-        this.log("getCurrentTemperature succeeded");
-        var f = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].temperature;
-        var c = ftoc(f);
-        callback(null, c);
-      }
-    }.bind(this));
+
   },
   getTargetTemperature: function(callback) {
-    this.httpRequest("houses/" + this.houseId, "GET", function(error, response, data){
-      if(error) {
-        this.log("Error in getTargetTemperature: %s", error);
-        callback(error);
-      } else {
-        var systemStatus = data.result._links.child[0].data.items[this.thermostatIndex].system_status;
-        var f = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].temperature;
-        if(systemStatus === "Cooling") {
-          f = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.cool;
-        }
-        if(systemStatus === "Heating") {
-          f = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.heat;
-        }
-        var c = ftoc(f);
-        callback(null, c);
-      }
-    }.bind(this));
+    
   },
   setTargetTemperature: function(value, callback) {
     var currentTemperature = 0;
