@@ -1,6 +1,6 @@
 {
 	"name": "homebridge-nexia-thermostat",
-	"version": "0.0.1",
+	"version": "0.0.4",
 	"description": "Nexia Thermostat plugin for homebridge: https://github.com/crizzwald/homebridge-nexia-thermostat",
 	"keywords": [
 		"homebridge-plugin"
@@ -17,7 +17,7 @@
 		"request": "^2.81.0"
 	},
 	"engines": {
-		"node": ">=0.12.0",
+		"node": ">=4.3.2",
 		"homebridge": ">=0.2.0"
 	}
 }

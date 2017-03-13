@@ -1,0 +1,24 @@
+{
+    "bridge": {
+        "name": "Homebridge",
+        "username": "CC:22:3D:E3:CE:30",
+        "port": 51826,
+        "pin": "031-45-154"
+    },
+    "description": "Crown Homebridge",
+    "accessories": [
+        {
+            "accessory": "NexiaThermostat",
+            "name": "Upstairs Thermostat",
+          	"apiroute": "https://www.mynexia.com/mobile/",
+            "houseId": "231228",
+            "thermostatIndex": 0,
+            "xMobileId": "231228",
+            "xApiKey": "fa6bd25c8d317efee8eefe357d2ac985",
+            "manufacturer": "Nexia",
+            "model": "GoldXV",
+            "serialNumber": "ACONT824"
+        }
+    ],
+    "platforms": []
+}
