@@ -138,7 +138,61 @@ NexiaThermostat.prototype = {
 		}, function(err, response, body) {
 			if (!err && response.statusCode == 200) {
 				this.log("response success");
-				callback(null); // success
+        var currentTemperature = 0;
+        var currentHeat = 0;
+        var currentCool = 0;
+        var isHeating = false;
+        var isCooling = false;
+        var isWaiting = false;
+        var data = JSON.parse(body);
+        var systemStatus = data.result._links.child[0].data.items[this.thermostatIndex].system_status;
+        if(systemStatus === "Waiting...") {
+          isWaiting = true;
+        } else if(systemStatus === "Heating") {
+          isHeating = true;
+        } else if(systemStatus === "Cooling") {
+          isCooling = true;
+        }
+
+        currentTemperature = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].temperature;
+        currentHeat = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.heat;
+        currentCool = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.cool;
+
+        var heatSetPoint = currentHeat;
+        var coolSetPoint = currentCool;
+
+        if(currentHeat === currentCool) {
+          coolSetPoint = this.ctof(value);
+          heatSetPoint = this.ctof(value);
+        } else if (isWaiting) {
+          if(currentTemperature === currentHeat) {
+            heatSetPoint = this.ctof(value);
+          }
+          if(currentTemperature === currentCool) {
+            coolSetPoint = this.ctof(value);
+          }
+        } else if (isHeating) {
+          heatSetPoint = this.ctof(value);
+        } else if (isCooling) {
+          coolSetPoint = this.ctof(value);
+        }
+
+        var postUrl = data.result._links.child[0].data.items[this.thermostatIndex].features[0].actions.set_heat_setpoint.href;
+        request({
+          url: postUrl,
+          method: "POST",
+          headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey},
+          body: { "heat" : heatSetPoint, "cool":coolSetPoint }
+        },
+        function (error, response, body) {
+          if(error) {
+            this.log("Error in post setpoints: %s", error);
+            callback(error);
+          } else {
+            this.log("Success in setpoint setting");
+            callback(null);
+          }
+        });
 			} else {
 				this.log("Error getting state: %s", err);
 				callback(err);
