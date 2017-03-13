@@ -39,70 +39,10 @@ NexiaThermostat.prototype = {
 
   },
   getTargetTemperature: function(callback) {
-    
+
   },
   setTargetTemperature: function(value, callback) {
-    var currentTemperature = 0;
-    var currentHeat = 0;
-    var currentCool = 0;
-    var isHeating = false;
-    var isCooling = false;
-    var isWaiting = false;
-    this.httpRequest("houses/" + this.houseId, "GET", function(error, response, data){
-      if(error) {
-        this.log("Error in setTargetTemperature: %s", error);
-      } else {
-        this.log("setTargetTemperature succeded");
-        var systemStatus = data.result._links.child[0].data.items[this.thermostatIndex].system_status;
-        if(systemStatus === "Waiting...") {
-          isWaiting = true;
-        } else if(systemStatus === "Heating") {
-          isHeating = true;
-        } else if(systemStatus === "Cooling") {
-          isCooling = true;
-        }
 
-        currentTemperature = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].temperature;
-        currentHeat = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.heat;
-        currentCool = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.cool;
-
-        var heatSetPoint = currentHeat;
-        var coolSetPoint = currentCool;
-
-        if(currentHeat === currentCool) {
-          coolSetPoint = this.ctof(value);
-          heatSetPoint = this.ctof(value);
-        } else if (isWaiting) {
-          if(currentTemperature === currentHeat) {
-            heatSetPoint = this.ctof(value);
-          }
-          if(currentTemperature === currentCool) {
-            coolSetPoint = this.ctof(value);
-          }
-        } else if (isHeating) {
-          heatSetPoint = this.ctof(value);
-        } else if (isCooling) {
-          coolSetPoint = this.ctof(value);
-        }
-
-        var postUrl = data.result._links.child[0].data.items[this.thermostatIndex].features[0].actions.set_heat_setpoint.href;
-        request({
-          url: postUrl,
-          method: "POST",
-          headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey},
-          body: { "heat" : heatSetPoint, "cool":coolSetPoint }
-        },
-        function (error, response, body) {
-          if(error) {
-            this.log("Error in post setpoints: %s", error);
-            callback(error);
-          } else {
-            this.log("Success in setpoint setting");
-            callback(null);
-          }
-        })
-      }
-    }.bind(this));
   },
   getTemperatureDisplayUnits: function(callback) {
     callback(null, Characteristic.TemperatureDisplayUnits.FAHRENHEIT);
@@ -111,30 +51,10 @@ NexiaThermostat.prototype = {
     callback(null);//no error
   },
   getCoolingThresholdTemperature: function(callback) {
-    this.httpRequest("houses/" + this.houseId, "GET", function(error, response, data){
-      if(error) {
-        this.log("Error in getCoolingThresholdTemperature: %s", error);
-        callback(error);
-      } else {
-        this.log("getCoolingThresholdTemperature succeeded");
-        var currentCool = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.cool;
-        var currentCoolC = this.ftoc(currentCool);
-        callback(null,  currentCoolC);
-      }
-    }.bind(this));
+
   },
   getHeatingThresholdTemperature: function(callback) {
-    this.httpRequest("houses/" + this.houseId, "GET", function(error, response, data){
-      if(error) {
-        this.log("Error in getHeatingThresholdTemperature: %s", error);
-        callback(error);
-      } else {
-        this.log("getHeatingThresholdTemperature succeeded");
-        var currentHeat = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.heat;
-        var currentHeatC = this.ftoc(currentHeat);
-        callback(null, currentHeatC);
-      }
-    }.bind(this));
+    
   },
   getName: function(callback) {
 		this.log("getName :", this.name);

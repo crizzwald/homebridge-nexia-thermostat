@@ -30,7 +30,7 @@ NexiaThermostat.prototype = {
 	},
 	// Required
 	getCurrentHeatingCoolingState: function(callback) {
-		this.log("getCurrentHeatingCoolingState from:", this.apiroute+"/status");
+		this.log("getCurrentHeatingCoolingState");
 		request.get({
 			url: this.apiroute + "houses/" + this.houseId,
 			headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
@@ -55,7 +55,7 @@ NexiaThermostat.prototype = {
 		}.bind(this));
 	},
 	getTargetHeatingCoolingState: function(callback) {
-		this.log("getTargetHeatingCoolingState from:", this.apiroute+"/status");
+		this.log("getTargetHeatingCoolingState");
 		request.get({
 			url: this.apiroute + "houses/" + this.houseId,
       headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
@@ -88,7 +88,7 @@ NexiaThermostat.prototype = {
 		}
 	},
 	getCurrentTemperature: function(callback) {
-		this.log("getCurrentTemperature from:", this.apiroute+"/status");
+		this.log("getCurrentTemperature");
 		request.get({
       url: this.apiroute + "houses/" + this.houseId,
       headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
@@ -106,7 +106,7 @@ NexiaThermostat.prototype = {
 		}.bind(this));
 	},
 	getTargetTemperature: function(callback) {
-		this.log("getTargetTemperature from:", this.apiroute+"/status");
+		this.log("getTargetTemperature");
 		request.get({
       url: this.apiroute + "houses/" + this.houseId,
       headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
@@ -131,10 +131,10 @@ NexiaThermostat.prototype = {
 		}.bind(this));
 	},
 	setTargetTemperature: function(value, callback) {
-		this.log("setTargetTemperature from:", this.apiroute+"/targetTemperature/"+value);
+		this.log("setTargetTemperature from");
 		request.get({
-			url: this.apiroute+"/targetTemperature/"+value,
-			auth : this.auth
+      url: this.apiroute + "houses/" + this.houseId,
+      headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
 		}, function(err, response, body) {
 			if (!err && response.statusCode == 200) {
 				this.log("response success");
@@ -162,19 +162,19 @@ NexiaThermostat.prototype = {
         var coolSetPoint = currentCool;
 
         if(currentHeat === currentCool) {
-          coolSetPoint = this.ctof(value);
-          heatSetPoint = this.ctof(value);
+          coolSetPoint = value * 1.8000 + 32.00;
+          heatSetPoint = value * 1.8000 + 32.00;
         } else if (isWaiting) {
           if(currentTemperature === currentHeat) {
-            heatSetPoint = this.ctof(value);
+            heatSetPoint = value * 1.8000 + 32.00;
           }
           if(currentTemperature === currentCool) {
-            coolSetPoint = this.ctof(value);
+            coolSetPoint = value * 1.8000 + 32.00;
           }
         } else if (isHeating) {
-          heatSetPoint = this.ctof(value);
+          heatSetPoint = value * 1.8000 + 32.00;
         } else if (isCooling) {
-          coolSetPoint = this.ctof(value);
+          coolSetPoint = value * 1.8000 + 32.00;
         }
 
         var postUrl = data.result._links.child[0].data.items[this.thermostatIndex].features[0].actions.set_heat_setpoint.href;
@@ -200,67 +200,49 @@ NexiaThermostat.prototype = {
 		}.bind(this));
 	},
 	getTemperatureDisplayUnits: function(callback) {
-		this.log("getTemperatureDisplayUnits:", this.temperatureDisplayUnits);
 		var error = null;
-		callback(error, this.temperatureDisplayUnits);
+    callback(null, Characteristic.TemperatureDisplayUnits.FAHRENHEIT);
 	},
 	setTemperatureDisplayUnits: function(value, callback) {
-		this.log("setTemperatureDisplayUnits from %s to %s", this.temperatureDisplayUnits, value);
-		this.temperatureDisplayUnits = value;
-		var error = null;
-		callback(error);
+		callback(null);
 	},
 
 	// Optional
-	getCurrentRelativeHumidity: function(callback) {
-		this.log("getCurrentRelativeHumidity from:", this.apiroute+"/status");
+	getCoolingThresholdTemperature: function(callback) {
+    this.log("getCoolingThresholdTemperature");
 		request.get({
-			url: this.apiroute+"/status",
-			auth : this.auth
+      url: this.apiroute + "houses/" + this.houseId,
+      headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
 		}, function(err, response, body) {
 			if (!err && response.statusCode == 200) {
 				this.log("response success");
-				var json = JSON.parse(body); //{"state":"OFF","targetStateCode":5,"temperature":"18.10","humidity":"34.10"}
-
-				if (json.currentRelativeHumidity != undefined)
-                                {
-                                  this.log("Humidity state is %s", json.currentRelativeHumidity);
-                                  this.currentRelativeHumidity = parseFloat(json.currentRelativeHumidity);
-                                }
-                                else
-                                {
-                                  this.log("Humidity %s", json.humidity);
-                                  this.currentRelativeHumidity = parseFloat(json.humidity);
-                                }
-
-				callback(null, this.currentRelativeHumidity); // success
+				var data = JSON.parse(body);
+        var currentCool = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.cool;
+        var currentCoolC = (currentCool-32.0) / 1.8;
+        callback(null,  currentCoolC);
 			} else {
 				this.log("Error getting state: %s", err);
 				callback(err);
 			}
 		}.bind(this));
 	},
-	getTargetRelativeHumidity: function(callback) {
-		this.log("getTargetRelativeHumidity:", this.targetRelativeHumidity);
-		var error = null;
-		callback(error, this.targetRelativeHumidity);
-	},
-	setTargetRelativeHumidity: function(value, callback) {
-		this.log("setTargetRelativeHumidity from/to :", this.targetRelativeHumidity, value);
-		this.log("setTargetRelativeHumidity not implemented with API");
-		this.targetRelativeHumidity = value;
-		var error = null;
-		callback(error);
-	},
-	getCoolingThresholdTemperature: function(callback) {
-		this.log("getCoolingThresholdTemperature: ", this.coolingThresholdTemperature);
-		var error = null;
-		callback(error, this.coolingThresholdTemperature);
-	},
 	getHeatingThresholdTemperature: function(callback) {
-		this.log("getHeatingThresholdTemperature :" , this.heatingThresholdTemperature);
-		var error = null;
-		callback(error, this.heatingThresholdTemperature);
+    this.log("getHeatingThresholdTemperature");
+		request.get({
+      url: this.apiroute + "houses/" + this.houseId,
+      headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
+		}, function(err, response, body) {
+			if (!err && response.statusCode == 200) {
+				this.log("response success");
+				var data = JSON.parse(body);
+        var currentHeat = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.heat;
+        var currentHeatC = (currentHeat-32.0) / 1.8;
+        callback(null, currentHeatC);
+			} else {
+				this.log("Error getting state: %s", err);
+				callback(err);
+			}
+		}.bind(this));
 	},
 	getName: function(callback) {
 		this.log("getName :", this.name);
@@ -306,15 +288,6 @@ NexiaThermostat.prototype = {
 			.on('set', this.setTemperatureDisplayUnits.bind(this));
 
 		// Optional Characteristics
-		this.service
-			.getCharacteristic(Characteristic.CurrentRelativeHumidity)
-			.on('get', this.getCurrentRelativeHumidity.bind(this));
-
-		this.service
-			.getCharacteristic(Characteristic.TargetRelativeHumidity)
-			.on('get', this.getTargetRelativeHumidity.bind(this))
-			.on('set', this.setTargetRelativeHumidity.bind(this));
-
 		this.service
 			.getCharacteristic(Characteristic.CoolingThresholdTemperature)
 			.on('get', this.getCoolingThresholdTemperature.bind(this));
