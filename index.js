@@ -180,6 +180,7 @@ NexiaThermostat.prototype = {
         }
 
         var postUrl = data.result._links.child[0].data.items[this.thermostatIndex].features[0].actions.set_heat_setpoint.href;
+        this.log("Setting setpoints to : " + postUrl);
         request({
           url: postUrl,
           method: "POST",
@@ -187,6 +188,7 @@ NexiaThermostat.prototype = {
           body: { "heat" : heatSetPoint, "cool":coolSetPoint }
         },
         function (error, response, body) {
+          this.log("Server response status code: %s", response.statusCode);
           if(error) {
             this.log("Error in post setpoints: %s", error);
             callback(error);
@@ -194,7 +196,7 @@ NexiaThermostat.prototype = {
             this.log("Success in setpoint setting");
             callback(null);
           }
-        });
+        }.bind(this));
 			} else {
 				this.log("Error setTargetTemperature: %s", err);
 				callback(err);
