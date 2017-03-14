@@ -133,7 +133,7 @@ NexiaThermostat.prototype = {
 		}.bind(this));
 	},
 	setTargetTemperature: function(value, callback) {
-		this.log("setTargetTemperature from");
+		this.log("setTargetTemperature to " + value);
 		request.get({
       url: this.apiroute + "houses/" + this.houseId,
       headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
