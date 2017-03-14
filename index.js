@@ -189,22 +189,23 @@ NexiaThermostat.prototype = {
 	},
   setSetPoints: function(postUrl, heatSetPoint, coolSetPoint, callback) {
     this.log("Setting to heat: " + heatSetPoint + ", cool: " + coolSetPoint);
-    var options = {
-      uri: postUrl,
-      method: 'POST',
-      headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey},
-      json: {
-        "heat": heatSetPoint,
-        "cool": coolSetPoint
-      }
-    };
-    request(options, function (error, response, body) {
-      if (!error && response.statusCode == 200) {
-        callback(null);
-      } else {
-        callback(error);
-      }
-    });
+    callback(null);
+    // var options = {
+    //   uri: postUrl,
+    //   method: 'POST',
+    //   headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey},
+    //   json: {
+    //     "heat": heatSetPoint,
+    //     "cool": coolSetPoint
+    //   }
+    // };
+    // request(options, function (error, response, body) {
+    //   if (!error && response.statusCode == 200) {
+    //     callback(null);
+    //   } else {
+    //     callback(error);
+    //   }
+    // });
   },
 	getTemperatureDisplayUnits: function(callback) {
 		var error = null;
