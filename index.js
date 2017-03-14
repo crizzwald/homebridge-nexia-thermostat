@@ -197,7 +197,7 @@ NexiaThermostat.prototype = {
         "cool": coolSetPoint
       }
     };
-    request(options, function (error, response, body, callback) {
+    request(options, function (error, response, body) {
       if (!error && response.statusCode == 200) {
         callback(null);
       } else {
