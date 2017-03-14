@@ -180,7 +180,7 @@ NexiaThermostat.prototype = {
         }
 
         var postUrl = data.result._links.child[0].data.items[this.thermostatIndex].features[0].actions.set_heat_setpoint.href;
-        setSetPoints(postUrl, heatSetPoint, coolSetPoint, callback);
+        this.setSetPoints(postUrl, heatSetPoint, coolSetPoint, callback);
 			} else {
 				this.log("Error setTargetTemperature: %s", err);
 				callback(err);
