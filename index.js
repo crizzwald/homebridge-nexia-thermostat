@@ -102,7 +102,7 @@ NexiaThermostat.prototype = {
         var c = (f-32.0) / 1.8;
         callback(null, c);
 			} else {
-				this.log("Error getting state: %s", err);
+				this.log("Error getCurrentTemperature: %s", err);
 				callback(err);
 			}
 		}.bind(this));
@@ -127,7 +127,7 @@ NexiaThermostat.prototype = {
         var c = (f-32.0) / 1.8;
         callback(null, c);
 			} else {
-				this.log("Error getting state: %s", err);
+				this.log("Error getTargetTemperature: %s", err);
 				callback(err);
 			}
 		}.bind(this));
@@ -196,7 +196,7 @@ NexiaThermostat.prototype = {
           }
         });
 			} else {
-				this.log("Error getting state: %s", err);
+				this.log("Error setTargetTemperature: %s", err);
 				callback(err);
 			}
 		}.bind(this));
@@ -223,7 +223,7 @@ NexiaThermostat.prototype = {
         var currentCoolC = (currentCool-32.0) / 1.8;
         callback(null,  currentCoolC);
 			} else {
-				this.log("Error getting state: %s", err);
+				this.log("Error getCoolingThresholdTemperature: %s", err);
 				callback(err);
 			}
 		}.bind(this));
@@ -241,7 +241,7 @@ NexiaThermostat.prototype = {
         var currentHeatC = (currentHeat-32.0) / 1.8;
         callback(null, currentHeatC);
 			} else {
-				this.log("Error getting state: %s", err);
+				this.log("Error getHeatingThresholdTemperature: %s", err);
 				callback(err);
 			}
 		}.bind(this));
@@ -259,9 +259,9 @@ NexiaThermostat.prototype = {
 		var informationService = new Service.AccessoryInformation();
 
 		informationService
-			.setCharacteristic(Characteristic.Manufacturer, "HTTP Manufacturer")
-			.setCharacteristic(Characteristic.Model, "HTTP Model")
-			.setCharacteristic(Characteristic.SerialNumber, "HTTP Serial Number");
+			.setCharacteristic(Characteristic.Manufacturer, this.manufacturer)
+			.setCharacteristic(Characteristic.Model, this.model)
+			.setCharacteristic(Characteristic.SerialNumber, this.serialNumber);
 
 
 
@@ -302,19 +302,6 @@ NexiaThermostat.prototype = {
 		this.service
 			.getCharacteristic(Characteristic.Name)
 			.on('get', this.getName.bind(this));
-		this.service.getCharacteristic(Characteristic.CurrentTemperature)
-			.setProps({
-				minValue: this.minTemp,
-				maxValue: this.maxTemp,
-				minStep: 1
-			});
-		this.service.getCharacteristic(Characteristic.TargetTemperature)
-			.setProps({
-				minValue: this.minTemp,
-				maxValue: this.maxTemp,
-				minStep: 1
-			});
-		this.log(this.minTemp);
 		return [informationService, this.service];
 	}
 };
