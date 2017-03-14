@@ -164,21 +164,22 @@ NexiaThermostat.prototype = {
 	},
   setCoolingThresholdTemperature: function(value, callback) {
     this.log("setCoolingThresholdTemperature to " + value);
-    request.get({
-        url: this.apiroute + "houses/" + this.houseId,
-        headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
-  		}, function(err, response, body) {
-  			if (!err && response.statusCode == 200) {
-  				var data = JSON.parse(body);
-          var currentHeatSetPoint = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.heat;
-          coolSetPoint = value * 1.8000 + 32.00;
-          var postUrl = data.result._links.child[0].data.items[this.thermostatIndex].features[0].actions.set_heat_setpoint.href;
-          this.setSetPoints(postUrl, currentHeatSetPoint, coolSetPoint, callback);
-  			} else {
-  				this.log("Error setCoolingThresholdTemperature: %s", err);
-  				callback(err);
-  			}
-  		}.bind(this));
+    callback(null);
+    // request.get({
+    //     url: this.apiroute + "houses/" + this.houseId,
+    //     headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
+  	// 	}, function(err, response, body) {
+  	// 		if (!err && response.statusCode == 200) {
+  	// 			var data = JSON.parse(body);
+    //       var currentHeatSetPoint = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.heat;
+    //       coolSetPoint = value * 1.8000 + 32.00;
+    //       var postUrl = data.result._links.child[0].data.items[this.thermostatIndex].features[0].actions.set_heat_setpoint.href;
+    //       this.setSetPoints(postUrl, currentHeatSetPoint, coolSetPoint, callback);
+  	// 		} else {
+  	// 			this.log("Error setCoolingThresholdTemperature: %s", err);
+  	// 			callback(err);
+  	// 		}
+  	// 	}.bind(this));
   },
 	getHeatingThresholdTemperature: function(callback) {
     this.log("getHeatingThresholdTemperature");
@@ -200,21 +201,22 @@ NexiaThermostat.prototype = {
 	},
   setHeatingThresholdTemperature: function(value, callback) {
     this.log("setHeatingThresholdTemperature to " + value);
-    request.get({
-        url: this.apiroute + "houses/" + this.houseId,
-        headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
-  		}, function(err, response, body) {
-  			if (!err && response.statusCode == 200) {
-  				var data = JSON.parse(body);
-          var currentCoolSetPoint = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.cool;
-          heatSetPoint = value * 1.8000 + 32.00;
-          var postUrl = data.result._links.child[0].data.items[this.thermostatIndex].features[0].actions.set_heat_setpoint.href;
-          this.setSetPoints(postUrl, heatSetPoint, currentCoolSetPoint, callback);
-  			} else {
-  				this.log("Error setHeatingThresholdTemperature: %s", err);
-  				callback(err);
-  			}
-  		}.bind(this));
+    callback(null);
+    // request.get({
+    //     url: this.apiroute + "houses/" + this.houseId,
+    //     headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
+  	// 	}, function(err, response, body) {
+  	// 		if (!err && response.statusCode == 200) {
+  	// 			var data = JSON.parse(body);
+    //       var currentCoolSetPoint = data.result._links.child[0].data.items[this.thermostatIndex].zones[0].setpoints.cool;
+    //       heatSetPoint = value * 1.8000 + 32.00;
+    //       var postUrl = data.result._links.child[0].data.items[this.thermostatIndex].features[0].actions.set_heat_setpoint.href;
+    //       this.setSetPoints(postUrl, heatSetPoint, currentCoolSetPoint, callback);
+  	// 		} else {
+  	// 			this.log("Error setHeatingThresholdTemperature: %s", err);
+  	// 			callback(err);
+  	// 		}
+  	// 	}.bind(this));
   },
   setSetPoints: function(postUrl, heatSetPoint, coolSetPoint, callback) {
     this.log("Setting to heat: " + heatSetPoint + ", cool: " + coolSetPoint);
