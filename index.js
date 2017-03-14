@@ -188,6 +188,7 @@ NexiaThermostat.prototype = {
 		}.bind(this));
 	},
   setSetPoints: function(postUrl, heatSetPoint, coolSetPoint, callback) {
+    this.log("Setting to heat: " + heatSetPoint + ", cool: " + coolSetPoint);
     var options = {
       uri: postUrl,
       method: 'POST',
