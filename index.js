@@ -180,29 +180,31 @@ NexiaThermostat.prototype = {
         }
 
         var postUrl = data.result._links.child[0].data.items[this.thermostatIndex].features[0].actions.set_heat_setpoint.href;
-        this.log("Setting setpoints to : " + postUrl);
-        request({
-          url: postUrl,
-          method: "POST",
-          headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey},
-          body: { "heat" : heatSetPoint, "cool":coolSetPoint }
-        },
-        function (error, response, body) {
-          this.log("Server response status code: %s", response.statusCode);
-          if(error) {
-            this.log("Error in post setpoints: %s", error);
-            callback(error);
-          } else {
-            this.log("Success in setpoint setting");
-            callback(null);
-          }
-        }.bind(this));
+        setSetPoints(postUrl, heatSetPoint, coolSetPoint, callback);
 			} else {
 				this.log("Error setTargetTemperature: %s", err);
 				callback(err);
 			}
 		}.bind(this));
 	},
+  setSetPoints: function(postUrl, heatSetPoint, coolSetPoint, callback) {
+    var options = {
+      uri: postUrl,
+      method: 'POST',
+      headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey},
+      json: {
+        "heat": heatSetPoint,
+        "cool": coolSetPoint
+      }
+    };
+    request(options, function (error, response, body, callback) {
+      if (!error && response.statusCode == 200) {
+        callback(null);
+      } else {
+        callback(error);
+      }
+    });
+  },
 	getTemperatureDisplayUnits: function(callback) {
 		var error = null;
     callback(null, Characteristic.TemperatureDisplayUnits.FAHRENHEIT);
