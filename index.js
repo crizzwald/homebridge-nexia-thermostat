@@ -234,6 +234,10 @@ NexiaThermostat.prototype = {
 			}
 		}.bind(this));
 	},
+  setCoolingThresholdTemperature: function(value, callback) {
+    this.log("setCoolingThresholdTemperature to " + value);
+    callback(null);
+  },
 	getHeatingThresholdTemperature: function(callback) {
     this.log("getHeatingThresholdTemperature");
 		request.get({
@@ -252,6 +256,10 @@ NexiaThermostat.prototype = {
 			}
 		}.bind(this));
 	},
+  setHeatingThresholdTemperature: function(value, callback) {
+    this.log("setHeatingThresholdTemperature to " + value);
+    callback(null);
+  },
 	getName: function(callback) {
 		this.log("getName :", this.name);
 		var error = null;
@@ -298,12 +306,14 @@ NexiaThermostat.prototype = {
 		// Optional Characteristics
 		this.service
 			.getCharacteristic(Characteristic.CoolingThresholdTemperature)
-			.on('get', this.getCoolingThresholdTemperature.bind(this));
+			.on('get', this.getCoolingThresholdTemperature.bind(this))
+      .on('set', this.setCoolingThresholdTemperature.bind(this));
 
 
 		this.service
 			.getCharacteristic(Characteristic.HeatingThresholdTemperature)
-			.on('get', this.getHeatingThresholdTemperature.bind(this));
+			.on('get', this.getHeatingThresholdTemperature.bind(this))
+      .on('set', this.setHeatingThresholdTemperature.bind(this));
 
 		this.service
 			.getCharacteristic(Characteristic.Name)
