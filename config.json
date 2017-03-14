@@ -18,6 +18,18 @@
             "manufacturer": "Nexia",
             "model": "GoldXV",
             "serialNumber": "ACONT824"
+        },
+        {
+            "accessory": "NexiaThermostat",
+            "name": "Upstairs",
+          	"apiroute": "https://www.mynexia.com/mobile/",
+            "houseId": "231228",
+            "thermostatIndex": 1,
+            "xMobileId": "1102012",
+            "xApiKey": "fa6bd25c8d317efee8eefe357d2ac985",
+            "manufacturer": "Nexia",
+            "model": "GoldXV",
+            "serialNumber": "ACONT824"
         }
     ],
     "platforms": []

@@ -139,7 +139,7 @@ NexiaThermostat.prototype = {
       headers: {"Content-Type": "application/json", "X-MobileId": this.xMobileId, "X-ApiKey": this.xApiKey}
 		}, function(err, response, body) {
 			if (!err && response.statusCode == 200) {
-				this.log("response success");
+				this.log("response success, new value %s", value);
         var currentTemperature = 0;
         var currentHeat = 0;
         var currentCool = 0;
